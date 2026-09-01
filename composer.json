@@ -1,0 +1,16 @@
+{
+    "name": "fatou/notation-universitaire",
+    "description": "Système de notation universitaire",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "fatou",
+            "email": "fn09072002@gmail.com"
+        }
+    ],
+    "require": {}
+}
