@@ -6,15 +6,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Service\Calcul\CalculNoteAvecRetardService;
 
+function verifier(string $intitule, float $attendu, float $obtenu): void
+{
+    if ($attendu !== $obtenu) {
+        throw new \RuntimeException("Échec [$intitule] : attendu $attendu, obtenu $obtenu");
+    }
+    echo "OK - $intitule\n";
+}
+
 $service = new CalculNoteAvecRetardService();
 
-$note = $service->calculer(15.0, new DateTimeImmutable('2026-06-10'), new DateTimeImmutable('2026-06-12'));
-assert($note === 15.0, "Échec : dépôt à temps devrait donner 15.0, obtenu $note");
+$note = $service->calculer(15.0, new \DateTimeImmutable('2026-06-10'), new \DateTimeImmutable('2026-06-12'));
+verifier('dépôt à temps', 15.0, $note);
 
-$note = $service->calculer(15.0, new DateTimeImmutable('2026-06-15'), new DateTimeImmutable('2026-06-12'));
-assert($note === 13.0, "Échec : dépôt en retard devrait donner 13.0, obtenu $note");
+$note = $service->calculer(15.0, new \DateTimeImmutable('2026-06-15'), new \DateTimeImmutable('2026-06-12'));
+verifier('dépôt en retard', 13.0, $note);
 
-$note = $service->calculer(1.0, new DateTimeImmutable('2026-06-15'), new DateTimeImmutable('2026-06-12'));
-assert($note === 0.0, "Échec : note plancher attendue à 0.0, obtenu $note");
+$note = $service->calculer(1.0, new \DateTimeImmutable('2026-06-15'), new \DateTimeImmutable('2026-06-12'));
+verifier('note plancher à 0', 0.0, $note);
 
 echo "Tous les tests sont passés.\n";
