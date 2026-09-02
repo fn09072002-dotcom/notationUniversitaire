@@ -111,3 +111,61 @@ Git (`.gitignore`).
 - Requêtes préparées pour se protéger des injections SQL.
 - Abstraction du SGBD.
 - Gestion des erreurs par exceptions.
+
+## Documentation — Création de la base de données
+
+### 1. Créer l'utilisateur et la base PostgreSQL
+
+```bash
+sudo -u postgres psql
+```
+```sql
+CREATE USER pape WITH PASSWORD '1234';
+CREATE DATABASE notation_universitaire;
+GRANT ALL PRIVILEGES ON DATABASE notation_universitaire TO pape;
+\q
+```
+
+### 2. Exécuter le schéma
+
+```bash
+psql -U pape -d notation_universitaire -h localhost -f database/schema.sql
+```
+
+### 3. Accorder les droits sur les tables
+
+Le `GRANT ALL PRIVILEGES ON DATABASE` ne donne pas automatiquement les
+droits sur les tables déjà créées. Il faut les accorder explicitement :
+
+```bash
+sudo -u postgres psql -d notation_universitaire
+```
+```sql
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pape;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO pape;
+\q
+```
+
+### 4. Configurer les identifiants de connexion
+
+Créer `config/config.php` (non versionné, exclu par `.gitignore`) :
+
+```php
+<?php
+
+return [
+    'db_host'     => 'localhost',
+    'db_port'     => '5432',
+    'db_name'     => 'notation_universitaire',
+    'db_user'     => 'pape',
+    'db_password' => '1234',
+];
+```
+
+### 5. Vérifier la connexion
+
+```bash
+php tests/test_connexion.php
+```
+
+Doit afficher le contenu de la table `copie_examen` sans erreur.
