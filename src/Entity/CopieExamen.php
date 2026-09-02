@@ -52,6 +52,17 @@ class CopieExamen extends AbstractDocument
         return $this->noteFinale;
     }
 
+    /**
+     * Impose la note finale depuis une source externe (ex: une stratégie de
+     * calcul du Service). Utilisé quand le calcul de pénalité ne doit pas
+     * être celui fixe de calculerNoteFinale(), mais celui d'une stratégie
+     * interchangeable (voir SoumissionCopieService).
+     */
+    public function setNoteFinale(float $noteFinale): void
+    {
+        $this->noteFinale = max(0, $noteFinale);
+    }
+
     public function isPenaliteAppliquee(): bool
     {
         return $this->penaliteAppliquee;
@@ -60,7 +71,6 @@ class CopieExamen extends AbstractDocument
     public function setPenaliteAppliquee(bool $penaliteAppliquee): void
     {
         $this->penaliteAppliquee = $penaliteAppliquee;
-        $this->calculerNoteFinale();
     }
 
     public function getDateLimite(): string
