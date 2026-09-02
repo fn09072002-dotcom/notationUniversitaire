@@ -169,3 +169,18 @@ php tests/test_connexion.php
 ```
 
 Doit afficher le contenu de la table `copie_examen` sans erreur.
+
+## partie 5
+
+
+1. Pourquoi un objet supplémentaire alors que $_POST existe déjà ?
+$_POST est un tableau non typé, mutable, dont les clés et le contenu dépendent entièrement de ce que le navigateur a envoyé — rien ne garantit qu'une clé existe, ni que sa valeur soit exploitable. Le transmettre tel quel aux classes métier les oblige à revalider et reconvertir les données à chaque appel, et couple la logique métier au format HTTP. Le DTO isole cette frontière : une fois construit, le reste de l'application peut faire confiance aux types qu'il expose.
+
+2. Différence avec CopieExamen ?
+CopieExamen est une entité du domaine : elle porte l'identité de la copie, ses règles métier (calcul de note, statut, etc.) et sa persistance. Le DTO ne porte aucune règle métier ni comportement — c'est une structure de transport, sans logique autre que la validation/conversion de son propre contenu. CopieExamen répond à « qu'est-ce qu'une copie et comment se comporte-t-elle ? », le DTO répond à « quelles données arrivent du formulaire, sous quelle forme ? ».
+
+3. Doit-il posséder un identifiant de base de données ?
+Non. Le DTO représente une intention de soumission venant du navigateur, pas une ligne existante en base. Lui donner un id mélangerait deux responsabilités (transport de saisie vs. identité persistée) et n'aurait aucun sens tant que l'enregistrement n'a pas eu lieu — c'est au service métier, une fois les données validées, de créer ou retrouver l'entité correspondante.
+
+4. Où doit avoir lieu la conversion des chaînes de dates ?
+Dans le DTO lui-même, au moment de sa construction depuis les données du formulaire (méthode depuisFormulaire / convertirDate ci-dessus) — jamais dans le contrôleur (qui ne doit pas connaître les règles de format) ni dans les classes métier (qui ne doivent recevoir que des DateTimeImmutable déjà fiables). C'est précisément le rôle du DTO : absorber la conversion et l'erreur de format à la frontière, avant que quoi que ce soit de métier ne soit sollicité.
