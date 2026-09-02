@@ -2,10 +2,10 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use App\Container\Connexion;
+use App\Repository\Database;
 
 try {
-    $pdo = Connexion::getInstance()->getPdo();
+    $pdo = Database::getInstance();
     $stmt = $pdo->query('SELECT * FROM copie_examen');
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

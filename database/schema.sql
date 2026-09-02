@@ -15,4 +15,3 @@ INSERT INTO copie_examen (date_depot, date_limite, note_brute, note_finale, pena
 VALUES ('2026-06-06', '2026-06-05', 15.5, 13.5, true);
 
 SELECT * FROM copie_examen;
-\q
