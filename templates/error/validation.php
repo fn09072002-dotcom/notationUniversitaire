@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Erreur de soumission</title>
+    <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
     <h1>La soumission n'a pas pu être enregistrée</h1>
