@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+// Sert les fichiers statiques réels directement, sans passer par le routeur.
 if (PHP_SAPI === 'cli-server') {
     $cheminDemande = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
     $fichierReel = __DIR__ . $cheminDemande;
@@ -12,20 +13,14 @@ if (PHP_SAPI === 'cli-server') {
         return false;
     }
 }
+
 use App\Controller\CopieExamenController;
-use App\Repository\Database;
-use App\Repository\PdoCopieExamenRepository;
-use App\Service\Calcul\CalculNoteAvecRetardService;
-use App\Service\SoumissionCopieService;
 use FastRoute\RouteCollector;
 
 use function FastRoute\simpleDispatcher;
 
-$pdo = Database::getInstance();
-$repository = new PdoCopieExamenRepository($pdo);
-$calcul = new CalculNoteAvecRetardService();
-$service = new SoumissionCopieService($calcul, $repository);
-$controller = new CopieExamenController($service, $repository);
+$container = require __DIR__ . '/../config/dependances.php';
+$controller = $container->get(CopieExamenController::class);
 
 $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->addRoute('GET', '/copies', 'afficherListe');
