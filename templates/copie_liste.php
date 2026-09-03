@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Liste des copies</title>
+    <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
     <h1>Copies enregistrées</h1>

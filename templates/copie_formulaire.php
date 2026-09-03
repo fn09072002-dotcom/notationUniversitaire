@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Soumettre une copie</title>
+    <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
     <h1>Soumettre une copie d'examen</h1>
