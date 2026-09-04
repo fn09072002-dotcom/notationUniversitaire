@@ -10,7 +10,11 @@ use App\Repository\PdoCopieExamenRepository;
 use App\Service\Calcul\CalculNoteAvecRetardService;
 use App\Service\Calcul\CalculNoteInterface;
 use App\Service\SoumissionCopieService;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
 use PDO;
+
+use function FastRoute\simpleDispatcher;
 
 $container = new Container();
 
@@ -49,6 +53,18 @@ $container->set(
             $c->get(SoumissionCopieService::class),
             $c->get(CopieExamenRepositoryInterface::class)
         );
+    }
+);
+
+$container->set(
+    Dispatcher::class,
+    function (Container $c) {
+        return simpleDispatcher(function (RouteCollector $r) {
+            $r->addRoute('GET', '/copies', 'afficherListe');
+            $r->addRoute('GET', '/copies/create', 'afficherFormulaire');
+            $r->addRoute('POST', '/copies', 'soumettre');
+            $r->addRoute('GET', '/copies/{id:\d+}', 'afficherDetail');
+        });
     }
 );
 
