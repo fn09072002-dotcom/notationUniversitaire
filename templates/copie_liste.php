@@ -22,7 +22,7 @@
                     <th>Note brute</th>
                     <th>Note finale</th>
                     <th>Pénalité</th>
-                    <th></th>
+                    <th>details</th>
                 </tr>
             </thead>
             <tbody>

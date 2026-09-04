@@ -34,8 +34,6 @@ final class SoumissionCopieService
             $dto->dateLimite->format('Y-m-d')
         );
 
-        // La stratégie de calcul (Partie 5) est la seule source de vérité :
-        // on impose son résultat, on n'utilise jamais le calcul interne fixe de l'entité.
         $copie->setNoteFinale($noteFinale);
 
         $id = $this->repository->save($copie);
