@@ -184,3 +184,20 @@ Non. Le DTO représente une intention de soumission venant du navigateur, pas un
 
 4. Où doit avoir lieu la conversion des chaînes de dates ?
 Dans le DTO lui-même, au moment de sa construction depuis les données du formulaire (méthode depuisFormulaire / convertirDate ci-dessus) — jamais dans le contrôleur (qui ne doit pas connaître les règles de format) ni dans les classes métier (qui ne doivent recevoir que des DateTimeImmutable déjà fiables). C'est précisément le rôle du DTO : absorber la conversion et l'erreur de format à la frontière, avant que quoi que ce soit de métier ne soit sollicité.
+
+
+## partie 12
+1. Quel problème ce composant résout-il ?
+Il évite que public/index.php connaisse l'ordre exact de construction de tous les objets du projet (PDO avant Repository, Repository avant Service, etc.). Sans lui, chaque modification d'une dépendance obligerait à retoucher le point d'entrée.
+
+2. Pourquoi enregistrer certaines définitions sous le nom d'un contrat ?
+Parce que le code qui consomme une dépendance (ex: SoumissionCopieService) ne devrait connaître que l'interface (CopieExamenRepositoryInterface), jamais l'implémentation concrète (PdoCopieExamenRepository). Ça permet de changer d'implémentation (par exemple une version en mémoire pour les tests) sans toucher au code qui l'utilise.
+
+3. Pourquoi ne faut-il pas rendre ce composant accessible depuis toutes les classes ?
+Si chaque classe pouvait appeler $container->get(...) directement, on retomberait dans l'anti-pattern du "Service Locator" : les dépendances d'une classe deviendraient invisibles (cachées dans son code plutôt qu'affichées dans son constructeur), rendant le code plus difficile à tester et à comprendre. Seul le point d'entrée (public/index.php) doit connaître le conteneur.
+
+4. Quel mécanisme et quel type de composant avez-vous mis en place ?
+Un conteneur d'injection de dépendances (Service Container), utilisant des fabriques (Closure) enregistrées à la demande et une mise en cache d'instance (comportement Singleton par entrée).
+
+5. Différence entre la construction manuelle et cette solution ?
+La construction manuelle (Partie 10) obligeait index.php à connaître et respecter l'ordre exact des dépendances entre elles. Le conteneur inverse ce contrôle : chaque objet déclare ce dont il a besoin (via son constructeur), et le conteneur résout l'ordre de construction automatiquement en cascade via les appels $container->get(...) imbriqués.
