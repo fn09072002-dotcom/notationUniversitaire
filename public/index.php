@@ -12,27 +12,14 @@ if (PHP_SAPI === 'cli-server') {
         return false;
     }
 }
+
 use App\Controller\CopieExamenController;
-use App\Repository\Database;
-use App\Repository\PdoCopieExamenRepository;
-use App\Service\Calcul\CalculNoteAvecRetardService;
-use App\Service\SoumissionCopieService;
-use FastRoute\RouteCollector;
+use FastRoute\Dispatcher;
 
-use function FastRoute\simpleDispatcher;
+$container = require __DIR__ . '/../config/dependances.php';
 
-$pdo = Database::getInstance();
-$repository = new PdoCopieExamenRepository($pdo);
-$calcul = new CalculNoteAvecRetardService();
-$service = new SoumissionCopieService($calcul, $repository);
-$controller = new CopieExamenController($service, $repository);
-
-$dispatcher = simpleDispatcher(function (RouteCollector $r) {
-    $r->addRoute('GET', '/copies', 'afficherListe');
-    $r->addRoute('GET', '/copies/create', 'afficherFormulaire');
-    $r->addRoute('POST', '/copies', 'soumettre');
-    $r->addRoute('GET', '/copies/{id:\d+}', 'afficherDetail');
-});
+$controller = $container->get(CopieExamenController::class);
+$dispatcher = $container->get(Dispatcher::class);
 
 $methode = $_SERVER['REQUEST_METHOD'];
 $uri = rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
@@ -40,17 +27,17 @@ $uri = rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 $routeInfo = $dispatcher->dispatch($methode, $uri);
 
 switch ($routeInfo[0]) {
-    case \FastRoute\Dispatcher::NOT_FOUND:
+    case Dispatcher::NOT_FOUND:
         http_response_code(404);
         require __DIR__ . '/../templates/error/404.php';
         break;
 
-    case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+    case Dispatcher::METHOD_NOT_ALLOWED:
         http_response_code(405);
         echo "Méthode non autorisée.";
         break;
 
-    case \FastRoute\Dispatcher::FOUND:
+    case Dispatcher::FOUND:
         $action = $routeInfo[1];
         $parametres = $routeInfo[2];
 
