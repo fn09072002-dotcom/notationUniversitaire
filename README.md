@@ -120,7 +120,7 @@ Git (`.gitignore`).
 sudo -u postgres psql
 ```
 ```sql
-CREATE USER pape WITH PASSWORD '1234';
+CREATE USER pape WITH PASSWORD 'votre_mot_de_passe';
 CREATE DATABASE notation_universitaire;
 GRANT ALL PRIVILEGES ON DATABASE notation_universitaire TO pape;
 \q
@@ -158,7 +158,7 @@ return [
     'db_port'     => '5432',
     'db_name'     => 'notation_universitaire',
     'db_user'     => 'pape',
-    'db_password' => '1234',
+    'db_password' => 'votre_mot_de_passe',
 ];
 ```
 
@@ -232,7 +232,7 @@ composer install
 sudo -u postgres psql
 ```
 ```sql
-CREATE USER pape WITH PASSWORD '1234';
+CREATE USER pape WITH PASSWORD 'votre_mot_de_passe';
 CREATE DATABASE notation_universitaire;
 GRANT ALL PRIVILEGES ON DATABASE notation_universitaire TO pape;
 \q
@@ -265,7 +265,7 @@ return [
     'db_port'     => '5432',
     'db_name'     => 'notation_universitaire',
     'db_user'     => 'pape',
-    'db_password' => '1234',
+    'db_password' => 'votre_mot_de_passe',
 ];
 ```
 
