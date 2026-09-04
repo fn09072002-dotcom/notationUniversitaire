@@ -1,0 +1,139 @@
+@startuml diagramme_classes
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+package "Entity" {
+  abstract class AbstractDocument {
+    # id : int
+    # dateDepot : string
+    + getId() : int
+    + setId(id : int) : void
+    + getDateDepot() : string
+  }
+
+  class CopieExamen {
+    - noteBrute : float
+    - noteFinale : float
+    - penaliteAppliquee : bool
+    - dateLimite : string
+    + getNoteBrute() : float
+    + setNoteBrute(noteBrute : float) : void
+    + getNoteFinale() : float
+    + setNoteFinale(noteFinale : float) : void
+    + isPenaliteAppliquee() : bool
+    + setPenaliteAppliquee(penaliteAppliquee : bool) : void
+    + getDateLimite() : string
+    - verifierNote(note : float) : void
+  }
+
+  AbstractDocument <|-- CopieExamen
+}
+
+package "DTO" {
+  class SoumettreCopieDTO {
+    + noteBrute : float
+    + dateDepot : DateTimeImmutable
+    + dateLimite : DateTimeImmutable
+    + {static} fromArray(data : array) : SoumettreCopieDTO
+  }
+}
+
+package "Service" {
+  interface CalculNoteInterface {
+    + calculer(noteBrute : float, dateDepot, dateLimite) : float
+  }
+
+  class CalculNoteAvecRetardService {
+    - PENALITE_RETARD : float
+    - NOTE_MINIMALE : float
+    + calculer(noteBrute : float, dateDepot, dateLimite) : float
+    - estEnRetard(dateDepot, dateLimite) : bool
+  }
+
+  class NoteValidator {
+    + {static} validate(noteBrute) : float
+  }
+
+  class DateUtils {
+    + {static} convertirDate(date, nomChamp) : DateTimeImmutable
+  }
+
+  class SoumissionCopieService {
+    - calculNote : CalculNoteInterface
+    - repository : CopieExamenRepositoryInterface
+    + soumettre(dto : SoumettreCopieDTO) : CopieExamen
+  }
+
+  CalculNoteInterface <|.. CalculNoteAvecRetardService
+  SoumissionCopieService --> CalculNoteInterface
+  SoumissionCopieService --> "CopieExamenRepositoryInterface"
+  SoumissionCopieService --> SoumettreCopieDTO
+  SoumissionCopieService --> CopieExamen
+  SoumettreCopieDTO ..> NoteValidator
+  SoumettreCopieDTO ..> DateUtils
+}
+
+package "Repository" {
+  interface CopieExamenRepositoryInterface {
+    + save(copieExamen : CopieExamen) : int
+    + findAll() : CopieExamen[]
+    + findById(id : int) : CopieExamen
+  }
+
+  class PdoCopieExamenRepository {
+    - pdo : PDO
+    + save(copieExamen : CopieExamen) : int
+    + findAll() : CopieExamen[]
+    + findById(id : int) : CopieExamen
+    - hydrater(row : array) : CopieExamen
+  }
+
+  class Database {
+    - {static} connection : PDO
+    + {static} getInstance() : PDO
+  }
+
+  CopieExamenRepositoryInterface <|.. PdoCopieExamenRepository
+  PdoCopieExamenRepository --> CopieExamen
+  PdoCopieExamenRepository --> Database
+}
+
+package "Controller" {
+  class CopieExamenController {
+    - service : SoumissionCopieService
+    - repository : CopieExamenRepositoryInterface
+    + afficherFormulaire() : void
+    + soumettre(donneesPost : array) : void
+    + afficherListe() : void
+    + afficherDetail(id : int) : void
+  }
+
+  CopieExamenController --> SoumissionCopieService
+  CopieExamenController --> CopieExamenRepositoryInterface
+  CopieExamenController --> SoumettreCopieDTO
+}
+
+package "Container" {
+  class Container {
+    - fabriques : array
+    - instances : array
+    + set(id : string, fabrique : Closure) : void
+    + get(id : string) : mixed
+  }
+}
+
+Container ..> CopieExamenController : construit
+Container ..> SoumissionCopieService : construit
+Container ..> PdoCopieExamenRepository : construit
+Container ..> CalculNoteAvecRetardService : construit
+Container ..> Database : construit
+
+note right of Container
+  Point de composition unique
+  (config/dependances.php)
+  utilise par public/index.php
+end note
+
+@enduml

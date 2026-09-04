@@ -201,3 +201,97 @@ Un conteneur d'injection de dépendances (Service Container), utilisant des fabr
 
 5. Différence entre la construction manuelle et cette solution ?
 La construction manuelle (Partie 10) obligeait index.php à connaître et respecter l'ordre exact des dépendances entre elles. Le conteneur inverse ce contrôle : chaque objet déclare ce dont il a besoin (via son constructeur), et le conteneur résout l'ordre de construction automatiquement en cascade via les appels $container->get(...) imbriqués.
+
+
+## Installation
+
+### Prerequis
+
+- PHP 8.1 ou superieur, avec l'extension `pdo_pgsql`
+- Composer
+- PostgreSQL
+
+### Etapes
+
+1. Cloner le depot :
+
+```bash
+git clone https://github.com/fn09072002-dotcom/notationUniversitaire.git
+cd notationUniversitaire
+```
+
+2. Installer les dependances :
+
+```bash
+composer install
+```
+
+3. Creer la base de donnees et l'utilisateur PostgreSQL :
+
+```bash
+sudo -u postgres psql
+```
+```sql
+CREATE USER pape WITH PASSWORD '1234';
+CREATE DATABASE notation_universitaire;
+GRANT ALL PRIVILEGES ON DATABASE notation_universitaire TO pape;
+\q
+```
+
+4. Executer le schema :
+
+```bash
+psql -U pape -d notation_universitaire -h localhost -f database/schema.sql
+```
+
+5. Accorder les droits sur les tables (necessaire apres la creation du schema) :
+
+```bash
+sudo -u postgres psql -d notation_universitaire
+```
+```sql
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pape;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO pape;
+\q
+```
+
+6. Creer `config/config.php` (non versionne) :
+
+```php
+<?php
+
+return [
+    'db_host'     => 'localhost',
+    'db_port'     => '5432',
+    'db_name'     => 'notation_universitaire',
+    'db_user'     => 'pape',
+    'db_password' => '1234',
+];
+```
+
+7. Lancer le serveur de developpement :
+
+```bash
+php -S localhost:8000 -t public public/index.php
+```
+
+8. Ouvrir `http://localhost:8000/copies` dans un navigateur.
+
+### Verifier l'installation
+
+```bash
+curl -i http://localhost:8000/copies
+```
+
+Doit repondre `200 OK` avec la liste des copies (vide sur une base neuve).
+
+## Documents annexes
+
+- `ANALYSE.md` — principes SOLID et concepts d'architecture appliques au projet.
+- `TESTS.md` — preuves des scenarios fonctionnels valides.
+- `Classes.puml` — diagramme de classes final (source PlantUML).
+- `CHANGELOG.md` — journal des versions.
+
+## Historique des versions
+
+Voir `CHANGELOG.md` pour le detail de chaque version, de `v0.0.0` a `v1.0.0`.

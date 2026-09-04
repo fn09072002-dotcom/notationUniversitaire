@@ -34,3 +34,15 @@ Systeme de notation universitaire
 | **Conteneur d'injection de dependances** | `Container` (`src/Container/Container.php`), configure dans `config/dependances.php` | Centralise la construction et l'assemblage de tous les objets du projet | Evite que `public/index.php` connaisse l'ordre exact de construction de chaque dependance |
 | **Repository** | `CopieExamenRepositoryInterface` / `PdoCopieExamenRepository` | Isole les requetes SQL derriere une interface orientee metier (save, findAll, findById) | Evite que le SQL se retrouve disperse dans le Service ou le Controleur |
 | **Front Controller** | `public/index.php` | Point d'entree HTTP unique par lequel passent toutes les requetes | Evite d'avoir un fichier PHP executable par URL pour chaque action, chacun dupliquant sa propre logique de securite et de routage |
+## 3. Concepts decouverts pendant le developpement
+
+- **Singleton** : garantir une seule connexion PDO partagee pour toute la duree du script, plutot que d'en recreer une a chaque requete.
+- **DTO (Data Transfer Object)** : transporter des donnees deja validees et typees entre les couches, sans jamais transmettre `$_POST` brut aux classes metier.
+- **Pattern Strategie** : encapsuler une regle de calcul interchangeable (`CalculNoteInterface`) derriere un contrat commun, pour pouvoir la remplacer sans toucher au Service qui l'utilise.
+- **Repository** : isoler toutes les requetes SQL derriere une interface orientee metier, pour que le reste de l'application ne sache jamais qu'une base de donnees existe.
+- **Injection de dependances** : fournir les dependances d'une classe via son constructeur plutot que de les construire a l'interieur, ce qui rend chaque classe testable isolement.
+- **Conteneur d'injection de dependances** : centraliser la construction et l'assemblage de tous les objets du projet, pour que le point d'entree ne connaisse plus l'ordre de construction.
+- **Front Controller** : faire passer toutes les requetes HTTP par un unique point d'entree, plutot que d'exposer un fichier PHP par action.
+- **Requetes preparees** : se proteger des injections SQL en separant la structure de la requete des valeurs fournies par l'utilisateur.
+- **Piege PDO/PostgreSQL sur les booleens** : PHP convertit `false` en chaine vide dans un tableau passe a `execute()`, ce que PostgreSQL rejette comme valeur booleenne ; necessite un typage explicite via `bindValue(..., PDO::PARAM_BOOL)`.
+- **Difference entre GRANT sur une base et GRANT sur ses tables** : accorder des privileges sur une base PostgreSQL ne donne pas automatiquement les memes privileges sur les tables deja existantes a l'interieur.
